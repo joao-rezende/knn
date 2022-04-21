@@ -5,7 +5,7 @@ import numpy as np
 def euclideanDistance(data, data_, data_len):
     dist = 0
     for i in range(data_len):
-        dist = dist + np.square(data[i] - data_[i])
+        dist = dist + np.square(data[i] - data_[i + 1])
     return np.sqrt(dist)
 
 def knn(dataset, testset, k):
@@ -43,20 +43,19 @@ data = pd.read_csv(os.path.join("./", "iris.csv"), names=['id', 'sepal_length', 
 #Embaralhando os índices para dividir entre a base e os testes
 indexes = np.random.permutation(data.shape[0])
 
-#Definido um corte de 80%, ou seja, 80% do dados fornecidos serão de base e o resto de teste
-cut = int(0.8 * len(indexes))
+#Definido um corte de 60%, ou seja, 60% do dados fornecidos serão de base e o resto de teste
+cut = int(0.6 * len(indexes))
 base_id, test_id = indexes[:cut], indexes[cut:]
 baseset, test_data = data.loc[base_id,:], data.loc[test_id,:]
 
 test_specie = list(test_data.iloc[:,-1])
-# print(test_class)
 
 # Criando uma lista apenas com os dados de teste
 testset = []
 for index, rows in test_data.iterrows():
     testset.append([[rows.sepal_length, rows.sepal_width, rows.petal_length, rows.petal_width]])
 
-k_values = [1, 7]
+k_values = [1, 3, 5, 7]
 for k in k_values:
     counts = {
         "Iris-setosa" : {"Iris-setosa" : 0, "Iris-versicolor" : 0, "Iris-virginica" : 0}, 
@@ -66,7 +65,6 @@ for k in k_values:
     correct = 0
     for i in range(len(testset)):
         specie_result = knn(baseset, pd.DataFrame(testset[i]), k)
-        print(specie_result)
         counts[test_specie[i]][specie_result] += 1
         if (specie_result == test_specie[i]):
             correct += 1
@@ -77,4 +75,4 @@ for k in k_values:
     print("Iris setosa     |          " + str(counts['Iris-setosa']['Iris-setosa']) + " |               " + str(counts['Iris-setosa']['Iris-versicolor']) + " |              " + str(counts['Iris-setosa']['Iris-virginica']) + "")
     print("Iris versicolor |          " + str(counts['Iris-versicolor']['Iris-setosa']) + " |               " + str(counts['Iris-versicolor']['Iris-versicolor']) + " |              " + str(counts['Iris-versicolor']['Iris-virginica']) + "")
     print("Iris virginica  |          " + str(counts['Iris-virginica']['Iris-setosa']) + " |               " + str(counts['Iris-virginica']['Iris-versicolor']) + " |              " + str(counts['Iris-virginica']['Iris-virginica']) + "")
-    # print(counts)
+    print("\n")
